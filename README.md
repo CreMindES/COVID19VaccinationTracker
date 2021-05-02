@@ -2,6 +2,10 @@
 
 A Twitter bot tracking COVID-19 Vacciation numbers in Hungary.
 
+<p align=center>
+  <img height=120 src=https://user-images.githubusercontent.com/5306361/116821253-71964c80-ab79-11eb-8d9d-a634799e1297.png>
+</p>
+
 ## Building
 
 ```bash
