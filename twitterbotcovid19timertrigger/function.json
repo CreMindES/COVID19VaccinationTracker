@@ -1,0 +1,10 @@
+{
+  "bindings": [
+    {
+      "name": "twitterbotcovid19timertrigger",
+      "type": "timerTrigger",
+      "direction": "in",
+      "schedule": "* */10 * * * *"
+    }
+  ]
+}
