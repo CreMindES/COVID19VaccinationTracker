@@ -3,7 +3,6 @@ package covidtracker
 import (
 	"bytes"
 	"context"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -90,6 +89,18 @@ func drawASCIIProgressBar(percentage float64, width int) string {
 	return progressBarStr
 }
 
+type ErrInvalidTweetFormatting struct {
+	message string
+}
+
+func (e *ErrInvalidTweetFormatting) Error() string {
+	if len(e.message) == 0 {
+		return "Invalid tweet formatting."
+	}
+
+	return e.message
+}
+
 // FetchCVNLast fetches the last reposted vaccination numbers from the last Twitter status update.
 // Unfortunately in Hungary there is no official API and since this bot aims to be stateless and minimal,
 // it's much easier to get the last tweet than to keep a database for just this, although that would be a proper design
@@ -159,19 +170,20 @@ func FetchCVN() (int, error) {
 	// parse vaccination number
 	numRegexp := regexp.MustCompile(`<div id="api-beoltottak">(.*)</div>`)
 	numRegexpMatchList := numRegexp.FindAllStringSubmatch(pageContent, -1)
-	if len(numRegexpMatchList[0]) == 2 {
-		numStr := numRegexpMatchList[0][1]
-		numStr = strings.ReplaceAll(numStr, " ", "")
 
-		// convert number string to integer
-		if num, err := strconv.Atoi(numStr); err == nil {
-			return num, nil
-		} else {
-			fmt.Errorf("cannot convert vaccination string count to int | %w", err)
-		}
+	if numFieldsMust := 2; len(numRegexpMatchList[0]) != numFieldsMust {
+		return -1, &ErrInvalidTweetFormatting{"FetchCVN: invalid tweet message format."}
 	}
 
-	return -1, fmt.Errorf("cannot convert vaccination string count to int")
+	// convert number string to integer
+	numStr := numRegexpMatchList[0][1]
+	numStr = strings.ReplaceAll(numStr, " ", "")
+
+	if num, err := strconv.Atoi(numStr); err == nil {
+		return num, nil
+	}
+
+	return -1, fmt.Errorf("cannot convert vaccination string count to int | %w", err)
 }
 
 // Tweet sends a Twitter status update containing the latest vaccination statistics.
