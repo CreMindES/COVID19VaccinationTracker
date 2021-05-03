@@ -1,0 +1,19 @@
+linters:
+  enable-all: true
+
+run:
+  skip-dirs:
+    - .git
+    - .vscode
+    - .idea
+    - greet
+    - twitterbotcovid19timertrigger
+
+linters-settings:
+  gci:
+    local-prefixes:
+      github.com/cremindes/COVID19VaccinationTracker
+  godox:
+    keywords:
+      - NONE
+      
