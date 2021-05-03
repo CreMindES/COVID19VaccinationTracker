@@ -75,14 +75,15 @@ func drawASCIIProgressBar(percentage float64, width int) string {
 	progressBarStr := ""
 
 	markerEmpty := "░"
-	markerFull  := "▓"
+	markerFull := "▓"
 
 	fullCount := int(math.Round(float64(width) * percentage * PERCENT))
 
 	for i := 0; i < fullCount; i++ {
 		progressBarStr += markerFull
 	}
-	for i := fullCount+1; i <= width; i++ {
+
+	for i := fullCount + 1; i <= width; i++ {
 		progressBarStr += markerEmpty
 	}
 
@@ -101,9 +102,11 @@ func FetchCVNLast() (int, error) {
 	}
 
 	// get timeline
-	tweets, resp, err := client.Timelines.HomeTimeline(&twitter.HomeTimelineParams{
-		Count: 1,
-	})
+	tweets, resp, err := client.Timelines.HomeTimeline(
+		&twitter.HomeTimelineParams{ // nolint:exhaustivestruct
+			Count: 1,
+		},
+	)
 
 	if resp.StatusCode != http.StatusOK || err != nil {
 		fmt.Println("aww :(", resp.StatusCode)
@@ -205,33 +208,44 @@ type TwitterAuth struct {
 	accessTokenSecret string
 }
 
+type ErrMissingTwitterAuth struct {
+	missingAttr string
+}
+
+func (e *ErrMissingTwitterAuth) Error() string {
+	return fmt.Sprintf("missing Twitter auth attribute: %s", e.missingAttr)
+}
+
 // getTwitterAuth fetched a TwitterAuth object from os env.
 func getTwitterAuth() (TwitterAuth, error) {
-	twitterAuth := TwitterAuth {
-		apiKey: os.Getenv("API_KEY"),
-		apiSecretKey: os.Getenv("API_SECRET_KEY"),
-		accessToken: os.Getenv("ACCESS_TOKEN"),
+	twitterAuth := TwitterAuth{
+		apiKey:            os.Getenv("API_KEY"),
+		apiSecretKey:      os.Getenv("API_SECRET_KEY"),
+		accessToken:       os.Getenv("ACCESS_TOKEN"),
 		accessTokenSecret: os.Getenv("ACCESS_TOKEN_SECRET"),
 	}
 
 	if len(twitterAuth.apiKey) == 0 {
-		return twitterAuth, fmt.Errorf("missing API KEY")
+		return twitterAuth, &ErrMissingTwitterAuth{"API key"}
 	}
+
 	if len(twitterAuth.apiSecretKey) == 0 {
-		return twitterAuth, fmt.Errorf("missing API Secret Key")
+		return twitterAuth, &ErrMissingTwitterAuth{"API Secret Key"}
 	}
+
 	if len(twitterAuth.accessToken) == 0 {
-		return twitterAuth, fmt.Errorf("missing API Access Token")
+		return twitterAuth, &ErrMissingTwitterAuth{"Access Token"}
 	}
+
 	if len(twitterAuth.accessTokenSecret) == 0 {
-		return twitterAuth, fmt.Errorf("missing API Access Token Secret")
+		return twitterAuth, &ErrMissingTwitterAuth{"Access Token Secret"}
 	}
 
 	return twitterAuth, nil
 }
 
 // NewGoTwitterClient helper function creating the new Go-Twitter client.
-func NewGoTwitterClient() (*twitter.Client, error){
+func NewGoTwitterClient() (*twitter.Client, error) {
 	twitterAuth, err := getTwitterAuth()
 	if err != nil {
 		return nil, fmt.Errorf("cannot get twitter auth, %w", err)
