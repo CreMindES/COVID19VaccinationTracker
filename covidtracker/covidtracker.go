@@ -110,8 +110,7 @@ func FetchCVNLast() (int, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK || err != nil {
-		fmt.Println("aww :(", resp.StatusCode)
-		return -1, err
+		return -1, fmt.Errorf("failed to get last Twitter status, %w", err)
 	}
 
 	// fetch last vaccination number
@@ -120,12 +119,12 @@ func FetchCVNLast() (int, error) {
 	numStr = strings.ReplaceAll(numStr, " ", "")
 
 	if len(numStr) == 0 {
-		return -1, errors.New("empty last tweet")
+		return -1, &ErrInvalidTweetFormatting{""}
 	}
 
 	num, err := strconv.Atoi(numStr)
 	if err != nil {
-		return -1, err
+		return -1, fmt.Errorf("cannot convert last vaccination number to integer | %w", err)
 	}
 
 	return num, nil
