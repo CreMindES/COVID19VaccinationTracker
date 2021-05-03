@@ -33,6 +33,7 @@ func main() {
 	Log.Fatal(http.ListenAndServe(":"+port, mux))
 }
 
+// timerHandler is the main Azure Function timer based trigger function, i.e the real main function, when triggered.
 func timerHandler(w http.ResponseWriter, r *http.Request) {
 	Log.Debug("timerHandler | Timer handler called.")
 
@@ -93,6 +94,7 @@ func timerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Greet dummy Azure Functions HTTP handler.
 func Greet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
