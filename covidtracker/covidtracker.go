@@ -21,6 +21,11 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+const (
+	TIMEOUT = 10 // second
+	PERCENT = 0.01
+)
+
 // FetchPopulation looks up the population of country from wikidata.
 // In case of error, the population is set to -1.
 // Note: country selection is not yet implemented, it's hard coded to be Hungary at the moment.
@@ -73,7 +78,7 @@ func drawAsciiProgressBar(percentage float64, width int) string {
 	markerEmpty := "░"
 	markerFull  := "▓"
 
-	fullCount := int(math.Round(float64(width) * percentage / 100.0))
+	fullCount := int(math.Round(float64(width) * percentage * PERCENT))
 
 	for i := 0; i < fullCount; i++ {
 		progressBarStr += markerFull
@@ -127,9 +132,9 @@ func FetchCVNLast() (int, error) {
 func FetchCVN() (int, error) {
 	urlHU := "https://koronavirus.gov.hu/"
 
-	// create HTTP client with timeout
-	client := &http.Client{
-		Timeout: 10 * time.Second,
+	// client
+	client := &http.Client{ // nolint:exhaustivestruct
+		Timeout: time.Duration(TIMEOUT) * time.Second,
 	}
 
 	// make request
@@ -164,7 +169,7 @@ func FetchCVN() (int, error) {
 // Tweet sends a Twitter status update containing the latest vaccination statistics.
 func Tweet(vaccinatedNum int, population int) error {
 	// calculate vaccination progress
-	percentage := float64(vaccinatedNum) / float64(population) * 100.0
+	percentage := float64(vaccinatedNum) / float64(population) / PERCENT
 	progressBarWidth := 20
 
 	// assemble message
@@ -236,7 +241,7 @@ func NewGoTwitterClient() (*twitter.Client, error){
 	config := oauth1.NewConfig(twitterAuth.apiKey, twitterAuth.apiSecretKey)
 	token := oauth1.NewToken(twitterAuth.accessToken, twitterAuth.accessTokenSecret)
 	httpClient := config.Client(oauth1.NoContext, token)
-	httpClient.Timeout = 10 * time.Second
+	httpClient.Timeout = time.Duration(TIMEOUT) * time.Second
 
 	// Twitter client
 	client := twitter.NewClient(httpClient)
