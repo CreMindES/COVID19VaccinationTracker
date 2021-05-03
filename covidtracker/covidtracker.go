@@ -139,8 +139,14 @@ func FetchCVN() (int, error) {
 		Timeout: time.Duration(TIMEOUT) * time.Second,
 	}
 
+	// request
+	request, err := http.NewRequestWithContext(context.Background(), http.MethodGet, urlHU, nil)
+	if err != nil {
+		return -1, fmt.Errorf("FetchCVN | cannot make request | %w", err)
+	}
+
 	// make request
-	response, err := client.Get(urlHU)
+	response, err := client.Do(request)
 	if err != nil {
 		return -1, fmt.Errorf("cannot fetch latest vaccination numbers from website | %w", err)
 	}
