@@ -63,16 +63,15 @@ func FetchPopulation(country string) (int, error) {
 		return -1, fmt.Errorf("cannot read body of wikibase response | %w", err)
 	}
 
-	bodyJson := string(body)
+	bodyJSON := string(body)
 
-	num := gjson.Get(bodyJson, "results.bindings.0.population.value").Int()
-	fmt.Println(num)
+	num := gjson.Get(bodyJSON, "results.bindings.0.population.value").Int()
 
 	return int(num), nil
 }
 
-// drawAsciiProgressBar draws an ASCII progressbar based on the given percentage and target width.
-func drawAsciiProgressBar(percentage float64, width int) string {
+// drawASCIIProgressBar draws an ASCII progressbar based on the given percentage and target width.
+func drawASCIIProgressBar(percentage float64, width int) string {
 	progressBarStr := ""
 
 	markerEmpty := "░"
@@ -174,7 +173,7 @@ func Tweet(vaccinatedNum int, population int) error {
 
 	// assemble message
 	message := fmt.Sprintf("%s | %.2f%% | %s",
-		drawAsciiProgressBar(percentage, progressBarWidth),
+		drawASCIIProgressBar(percentage, progressBarWidth),
 		percentage,
 		humanize.FormatInteger("# ###.", vaccinatedNum))
 
