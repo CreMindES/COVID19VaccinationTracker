@@ -60,7 +60,7 @@ func FetchPopulation(country string) (int, error) {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return -11, fmt.Errorf("cannot read body of wikibase response | %w", err)
+		return -1, fmt.Errorf("cannot read body of wikibase response | %w", err)
 	}
 
 	bodyJson := string(body)
