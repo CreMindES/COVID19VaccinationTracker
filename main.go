@@ -53,35 +53,25 @@ func timerHandler(w http.ResponseWriter, r *http.Request) {
 	// get population
 	population, errP := covidtracker.FetchPopulation("Hungary")
 
-	if errLV != nil {
-		Log.Error(errLV)
+	if errLV != nil || errP != nil || errV != nil {
+		Log.Error(errLV, errP, errV)
 		w.WriteHeader(http.StatusNoContent)
-		return
-	}
 
-	if errP != nil {
-		Log.Error(errP)
-		w.WriteHeader(http.StatusNoContent)
-		return
-	}
-
-	if errV != nil {
-		Log.Error(errV)
-		w.WriteHeader(http.StatusNoContent)
 		return
 	}
 
 	if population == -1 || vaccinated == -1 {
 		Log.Error("timerHandler | invalid value, not tweeting.")
 		w.WriteHeader(http.StatusNoContent)
+
 		return
 	}
 
 	err := covidtracker.Tweet(vaccinated, population)
-
 	if err != nil {
 		Log.Error(err)
 		w.WriteHeader(http.StatusNoContent)
+
 		return
 	}
 
