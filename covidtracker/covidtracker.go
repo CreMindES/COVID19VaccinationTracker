@@ -107,6 +107,7 @@ func FetchCVNLast() (int, error) {
 			Count: 1,
 		},
 	)
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK || err != nil {
 		fmt.Println("aww :(", resp.StatusCode)
@@ -189,7 +190,8 @@ func Tweet(vaccinatedNum int, population int) error {
 	}
 
 	// Send a Tweet
-	_, _, errTweet := client.Statuses.Update(message, nil)
+	_, resp, errTweet := client.Statuses.Update(message, nil)
+	defer resp.Body.Close()
 
 	if errTweet != nil {
 		return fmt.Errorf("could not send tweet | %w", errTweet)
