@@ -1,4 +1,4 @@
-module github.com/cremindes/hucovidtracker
+module github.com/cremindes/COVID19VaccinationTracker
 
 go 1.16
 

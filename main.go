@@ -8,7 +8,7 @@ import (
 
 	Log "github.com/sirupsen/logrus"
 
-	"github.com/cremindes/hucovidtracker/covidtracker"
+	"github.com/cremindes/COVID19VaccinationTracker/covidtracker"
 )
 
 func main() {
